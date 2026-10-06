@@ -20,11 +20,13 @@
 
 fn task1_formatting() {
     let name = "Ada";
-    let age = 31;
-    println!("Name {name}, age {age}");
+    let age = 36;
+    println!("Name: {name}, age: {age}");
     println!("Pi to 3 places: {:.3}", std::f64::consts::PI);
     println!("|{:>8}|{:<8}|{:^8}|", "right", "left", "center");
-    println!("{:?}", (1, "two", 3.0));
+    println!("Debug: {:?}", (1, "two", 3.0));
+    println!("0x {:x}, 0b {:b}", 255, 10);
+    
 }
 
 // ---------------------------------------------------------------------------
@@ -56,7 +58,7 @@ fn factorial(n: i32) -> Option<u64> {
     if n >= 0 {
         let mut acc: u64 = 1;
         for i in 2..=n as u64 {
-            acc *= i;
+            acc = match acc.checked_mul(i) { Some(v) => v, None => return None };
         }
         Some(acc)
     } else {
@@ -112,7 +114,7 @@ fn sign(x: i32) -> String {
 // `x * x;` (a statement, value `()`) instead of `x * x` (an expression).
 // Write it as an expression so it actually returns i32.
 fn square(x: i32) -> i32 {
-    todo!()
+    x*x
 }
 
 // task4_expressions:
@@ -123,7 +125,16 @@ fn square(x: i32) -> i32 {
 // and print y. As a comment: what would y be if the block's last line ended
 // with a semicolon instead?
 fn task4_expressions() {
-    todo!()
+    let f = celsius_to_fahrenheit(100.0);
+    println!("100C = {f}F");
+    let c = fahrenheit_to_celsius(212.0);
+    println!("212F = {c}C");
+    let s = sign(-3);
+    println!("sign(-3) = {s}");
+    let sq = square(7);
+    println!("square(7) = {sq}");
+    let y = { let a = 3; a * a + 1 };
+    println!("y = {y}");
 }
 
 // ---------------------------------------------------------------------------
@@ -135,36 +146,73 @@ fn task4_expressions() {
 // Use `match` on the tuple (n % 3, n % 5).
 // 3 -> "Fizz", 10 -> "Buzz", 15 -> "FizzBuzz", 7 -> "7"
 fn fizzbuzz(n: u32) -> String {
-    todo!()
+    match (n % 3, n % 5) {
+        (0, 0) => "FizzBuzz".to_string(),
+        (0, _) => "Fizz".to_string(),
+        (_, 0) => "Buzz".to_string(),
+        _ => n.to_string(),
+}
 }
 
 // Use `while`. 1 -> 0, 6 -> 8, 27 -> 111.
 fn collatz_steps(mut n: u64) -> u32 {
-    todo!()
+    let mut steps = 0;
+    while n != 1 {
+        if n % 2 == 0 {
+            n /= 2;
+        } else {
+         n = 3 * n + 1;
+        }
+        steps += 1;
+}
+steps
 }
 
 // Use `loop` or `while` — Euclid's algorithm. gcd(48, 18) == 6.
 fn gcd(mut a: u64, mut b: u64) -> u64 {
-    todo!()
+    while b != 0 {
+    let t = b;
+    b = a % b;
+    a = t;
+}
+a
 }
 
 // Use `for` over a range with an early `return`.
 // is_prime(2) == true, is_prime(97) == true, is_prime(1) == false.
 fn is_prime(n: u64) -> bool {
-    todo!()
+    if n < 2 {
+    return false;
+}
+for i in 2..n {
+    if n % i == 0 {
+        return false;
+    }
+}
+true
 }
 
 // Use `for` with tuple assignment: (a, b) = (b, a + b).
 // fib(0) == 0, fib(10) == 55, fib(50) == 12586269025.
 fn fib(n: u32) -> u64 {
-    todo!()
+    let (mut a, mut b) = (0u64, 1u64);
+for _ in 0..n {
+    (a, b) = (b, a + b);
+}
+a
 }
 
 // Use `match` with inclusive ranges, e.g. 90..=100.
 // 95 -> 'A', 72 -> 'C', 30 -> 'F'. Cover every possible u32 value: what
 // happens if you remove one arm?
 fn grade(points: u32) -> char {
-    todo!()
+    match points {
+    90..=100 => 'A',
+    80..=89 => 'B',
+    70..=79 => 'C',
+    60..=69 => 'D',
+    _ => 'F',
+}
 }
 
 // Print fizzbuzz(1..=20) with a `for` loop, then call the functions above
@@ -172,7 +220,14 @@ fn grade(points: u32) -> char {
 // Also try: for i in (1..=5).rev() {...} and for i in (0..20).step_by(5) {...}.
 // As a comment: what's the difference between 1..10 and 1..=10?
 fn task5_control_flow() {
-    todo!()
+    for i in 1..=20 {
+    println!("{}", fizzbuzz(i));
+}
+println!("{}", collatz_steps(27));
+println!("{}", gcd(48, 18));
+println!("{}", is_prime(97));
+println!("{}", fib(10));
+println!("{}", grade(72));
 }
 
 // ---------------------------------------------------------------------------
@@ -182,7 +237,13 @@ fn task5_control_flow() {
 // `loop` can return a value via `break value`.
 // first_power_of_two_above(5) == 8, first_power_of_two_above(8) == 16.
 fn first_power_of_two_above(n: u64) -> u64 {
-    todo!()
+    let mut p = 1;
+loop {
+    if p > n {
+        break p;
+    }
+    p *= 2;
+}
 }
 
 // Print this triangle with two nested `for` loops (outer i in 1..=9, inner
@@ -198,7 +259,15 @@ fn first_power_of_two_above(n: u64) -> u64 {
 //   8
 //   9
 fn task6_labelled(limit: u32) {
-    todo!()
+    'outer: for i in 1..=9 {
+    for j in 1..=9 {
+        if i * j > limit {
+            continue 'outer;
+        }
+        print!("{} ", i * j);
+    }
+    println!();
+}
 }
 
 // ---------------------------------------------------------------------------
@@ -208,13 +277,16 @@ fn task6_labelled(limit: u32) {
 // Return (min, max, average) of values.
 // min_max_avg(vec![3, -1, 7, 2]) == (-1, 7, 2.75)
 fn min_max_avg(values: Vec<i32>) -> (i32, i32, f64) {
-    todo!()
+    let min = *values.iter().min().unwrap();
+let max = *values.iter().max().unwrap();
+let avg = values.iter().sum::<i32>() as f64 / values.len() as f64;
+(min, max, avg)
 }
 
 // Swap the two elements of the tuple, returning them in the opposite order
 // and with types swapped accordingly.
 fn swap_pair(p: (i32, String)) -> (String, i32) {
-    todo!()
+    (p.1, p.0)
 }
 
 // 1. Call min_max_avg with vec![3, -1, 7, 2] and destructure + print the
@@ -226,7 +298,17 @@ fn swap_pair(p: (i32, String)) -> (String, i32) {
 //    computed at runtime (e.g. read from a variable).
 // 4. Call swap_pair and print the result.
 fn task7_compound() {
-    todo!()
+    let (lo, hi, avg) = min_max_avg(vec![3, -1, 7, 2]);
+println!("min={lo}, max={hi}, avg={avg}");
+
+let mut grid = [[0u8; 3]; 3];
+for i in 0..3 {
+    grid[i][i] = 1;
+}
+println!("{:?}", grid);
+
+let swapped = swap_pair((5, "hello".to_string()));
+println!("{:?}", swapped);
 }
 
 pub fn run() {
